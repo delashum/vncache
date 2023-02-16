@@ -1,0 +1,121 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react", "@typescript-eslint"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [".*/**/\\@main", "@h2/main"],
+            "message": "You should never import from @main"
+          },
+          {
+            "group": [".*/**/\\@portal"],
+            "message": "Use '@h2/portal'"
+          },
+          {
+            "group": [".*/**/\\@overlay"],
+            "message": "Use '@h2/overlay'"
+          },
+          {
+            "group": [".*/**/\\@api"],
+            "message": "Use '@h2/api'"
+          },
+          {
+            "group": [".*/**/\\@auth-utilities"],
+            "message": "Use '@h2/auth-utilities'"
+          },
+          {
+            "group": [".*/**/\\@devtools"],
+            "message": "Use '@h2/devtools'"
+          },
+          {
+            "group": [".*/**/\\@styleguide"],
+            "message": "Use '@h2/styleguide'"
+          },
+          {
+            "group": [".*/**/\\@shared-components"],
+            "message": "Use '@h2/shared-components'"
+          },
+          {
+            "group": [".*/**/\\@types"],
+            "message": "Use '@h2/types'"
+          },
+          {
+            "group": [".*/**/vncache"],
+            "message": "Use 'vncache'"
+          },
+          {
+            "group": [".*/**/vnrcache"],
+            "message": "Use 'vnrcache'"
+          },
+          {
+            "group": [".*/**/root"],
+            "message": "Use 'root'"
+          },
+          {
+            "group": [".*/**/\\@shared-utils"],
+            "message": "Use '@h2/shared-utils'"
+          }
+        ]
+      }
+    ],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          "{}": false
+        },
+        "extendDefaults": true
+      }
+    ],
+    "no-console": ["error", {"allow": ["warn", "error"]}],
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-unused-vars": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/ban-ts-comment": 1,
+    "@typescript-eslint/no-unnecessary-type-constraint": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-namespace": 0,
+    "no-sparse-arrays": 0,
+    "no-useless-escape": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/prop-types": 0,
+    "react/display-name": 0,
+    "no-magic-numbers": [
+      1,
+      {"ignore": [-10, -2, -1, 0, 1, 2, 7, 10, 24, 60, 100, 600, 800, 1000], "ignoreArrayIndexes": true}
+    ],
+    "no-restricted-globals": ["error", "location", "history", "open"]
+  },
+  "ignorePatterns": ["**/*.js"],
+  "overrides": [
+    {
+      "files": ["**/*.stories.tsx"],
+      "rules": {
+        "no-console": 0
+      }
+    },
+    {
+      "files": ["**/*.spec.ts"],
+      "rules": {
+        "no-magic-numbers": 0
+      }
+    }
+  ]
+}
