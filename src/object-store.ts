@@ -71,7 +71,7 @@ export const createObjectStore = <T extends BasicResource>(
       const entry = objectStore.get(key)
       const newData = getDataByKey(key)
       if (defaultedConfig.local && entry.initialized) setToLocal(getLocalKey(key), entry.data)
-      for (const fn of entry.subbers) fn(newData)
+      for (const fn of entry.subscribers) fn(newData)
     }
   }
 
@@ -106,6 +106,9 @@ export const createObjectStore = <T extends BasicResource>(
       entry.ids = [...ids]
       entry.initialized = true
       entry.resolver = null
+      entry.subscriberCleanup = resourceStore.subscribeIds([...ids], () => {
+        updateObjectSubscribers(key)
+      })
       updateObjectSubscribers(key)
     } catch (err: any) {
       entry.error = err
@@ -139,6 +142,7 @@ export const createObjectStore = <T extends BasicResource>(
     entry.initialized = false
     entry.ids = []
     entry.cleanup?.()
+    entry.subscriberCleanup?.()
     entry.cleanup = null
   }
 
@@ -183,7 +187,7 @@ export const createObjectStore = <T extends BasicResource>(
         data: null,
         ids: [],
         initialized: false,
-        subbers: new Set(),
+        subscribers: new Set(),
         resolver: null,
         fn,
         body,
@@ -202,7 +206,7 @@ export const createObjectStore = <T extends BasicResource>(
         clearTimeout(entry.activeTimer)
         activateObjectStore(key)
         entry.activeTimer = setTimeout(() => {
-          if (entry.subbers.size === 0) cleanupObjectStore(key)
+          if (entry.subscribers.size === 0) cleanupObjectStore(key)
         }, defaultedConfig.timeout)
       }
       return getDataByKey(key)
@@ -217,13 +221,13 @@ export const createObjectStore = <T extends BasicResource>(
     },
     subscribe: (key, fn) => {
       const entry = objectStore.get(key)
-      if (entry.subbers.size === 0) activateObjectStore(key)
-      entry.subbers.add(fn)
+      if (entry.subscribers.size === 0) activateObjectStore(key)
+      entry.subscribers.add(fn)
       clearTimeout(entry.activeTimer)
       return () => {
         entry.activeTimer = setTimeout(() => {
-          entry.subbers.delete(fn)
-          if (entry.subbers.size === 0) cleanupObjectStore(key)
+          entry.subscribers.delete(fn)
+          if (entry.subscribers.size === 0) cleanupObjectStore(key)
         }, defaultedConfig.timeout)
       }
     },

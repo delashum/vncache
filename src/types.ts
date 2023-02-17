@@ -112,6 +112,8 @@ export type RequestWatcherFn<T extends BasicResource = any, B = any, EV = any, C
   actions: RequestWatcherActions<T, B, CR>
 ) => void | (() => void)
 
+export type ResourceSubscriberFn<T extends BasicResource = any> = () => void
+
 export type InternalCacheWatcherFn<T extends BasicResource = any> = (
   body: ResourceCallbackArg<any>,
   actions: WatcherActions<T>
@@ -145,7 +147,8 @@ export type InternalResourceCache<T> = {
     sanitizedBody: ResourceCallbackArg,
     resolver: (body: ResourceCallbackArg) => Promise<T[]>
   ) => string
-  subscribe: (key: string, fn: (items: T[]) => void) => () => void
+  subscribeQuery: (key: string, fn: (items: T[]) => void) => () => void
+  subscribeIds: (ids: string[], fn: () => void) => () => void
 
   remove: (ids: string | string[]) => void
   upsert: (items: T | T[]) => void
@@ -247,7 +250,7 @@ export type ResourceCacheOptions = {
 type CacheEntry = {
   ids: string[]
   initialized: boolean
-  subbers: Set<(data: any) => void>
+  subscribers: Set<(data: any) => void>
   resolver: Promise<any> | null
   activeTimer: NodeJS.Timeout
   error: any
@@ -266,6 +269,7 @@ export type ObjectCache = CacheEntry & {
   body: any
   data: any
   key: string
+  subscriberCleanup?: () => void
   fn: (body: any, register: (data: any) => any) => Promise<any>
 }
 

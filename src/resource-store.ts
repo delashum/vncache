@@ -5,6 +5,7 @@ import {
   InternalResourceCache,
   ResourceCache,
   ResourceResponseMeta,
+  ResourceSubscriberFn,
   WatcherActions,
 } from './types'
 import {arraysIntersect, DEFAULT_TIMEOUT, distinct, ensureArray, getLocalMethods, hashBody, now} from './utilities'
@@ -45,6 +46,7 @@ export const createResourceStore = <T extends BasicResource>(
 
   const resources = buildResourceStore()
   const resourceStore = new Map<string, ResourceCache<T>>()
+  const resourceSubscribers = new Set<{fn: ResourceSubscriberFn<T>; ids: string[]}>()
 
   const getResourceStore = (key: string): ResourceCache<T> => {
     if (!resourceStore.has(key)) return null
@@ -52,7 +54,7 @@ export const createResourceStore = <T extends BasicResource>(
     if (!entry.refKey) return entry
     else {
       const _entry = getResourceStore(entry.refKey)
-      return {..._entry, ids: entry.ids, subbers: entry.subbers}
+      return {..._entry, ids: entry.ids, subscribers: entry.subscribers}
     }
   }
 
@@ -78,16 +80,24 @@ export const createResourceStore = <T extends BasicResource>(
     return distinct([...keys, ...newKeys])
   }
 
-  const updateSubscribers = (keys: string | string[]) => {
+  const updateQuerySubscribers = (keys: string | string[]) => {
     const _keys = ensureArray(keys)
     const keyArr = getChildrenKeys(_keys)
     for (const key of keyArr) {
       const entry = getResourceStore(key)
       const newData = getResourceData(key)
-      for (const fn of entry.subbers) fn(newData)
+      for (const fn of entry.subscribers) fn(newData)
       if (defaultedConfig.local && entry.initialized) setToLocal(getLocalKey(key), entry.ids)
     }
     if (defaultedConfig.local) setToLocal(getLocalKey(), [...resources.entries()])
+  }
+
+  const updateResourceSubscribers = (ids: string[]) => {
+    for (const subscriber of resourceSubscribers) {
+      if (arraysIntersect(ids, subscriber.ids)) {
+        subscriber.fn()
+      }
+    }
   }
 
   const getKeysFromIds = (ids: string[]) => {
@@ -124,7 +134,7 @@ export const createResourceStore = <T extends BasicResource>(
       resources.set(item.id, item)
     }
     setResourceStoreValues(key, {ids, initialized: true, resolver: null})
-    updateSubscribers(key)
+    updateQuerySubscribers(key)
   }
 
   const requestResources = async (key: string) => {
@@ -158,7 +168,8 @@ export const createResourceStore = <T extends BasicResource>(
       const entry = getResourceStore(cacheKey)
       setResourceStoreValues(cacheKey, {ids: entry.ids.filter(id => !ids.includes(id))})
     }
-    updateSubscribers(cachesToUpdate)
+    updateQuerySubscribers(cachesToUpdate)
+    updateResourceSubscribers(ids)
     for (const id of ids) resources.delete(id)
   }
 
@@ -182,7 +193,8 @@ export const createResourceStore = <T extends BasicResource>(
     }
     const updatedCaches = getKeysFromIds(ids)
     const cachesToUpdate = key ? [key] : numNewItems === 0 ? updatedCaches : distinct([...updatedCaches, ...allKeys])
-    updateSubscribers(cachesToUpdate)
+    updateResourceSubscribers(ids)
+    updateQuerySubscribers(cachesToUpdate)
   }
 
   const createActionsClosure = (key: string): WatcherActions<T> => ({
@@ -209,12 +221,12 @@ export const createResourceStore = <T extends BasicResource>(
     const passiveIds = new Set<string>()
     for (const [key, _entry] of resourceStore) {
       if (_entry.initialized) for (const id of _entry.ids) activeIds.add(id)
-      if (!_entry.initialized && _entry.subbers.size > 0) for (const id of _entry.ids) passiveIds.add(id)
+      if (!_entry.initialized && _entry.subscribers.size > 0) for (const id of _entry.ids) passiveIds.add(id)
     }
     const idsToDelete = oldIds.filter(id => !activeIds.has(id))
     const actuallyDontDeleteThese = new Set<string>()
     for (const [key, _entry] of resourceStore)
-      if (!_entry.initialized && _entry.subbers.size > 0 && idsToDelete.some(id => _entry.ids.includes(id))) {
+      if (!_entry.initialized && _entry.subscribers.size > 0 && idsToDelete.some(id => _entry.ids.includes(id))) {
         setResourceStoreValues(key, {initialized: true})
         for (const id of _entry.ids) actuallyDontDeleteThese.add(id)
       }
@@ -269,7 +281,7 @@ export const createResourceStore = <T extends BasicResource>(
       key: originalKey,
       ids,
       initialized: false,
-      subbers: new Set(),
+      subscribers: new Set(),
       resolver: null,
       refKey,
       fn,
@@ -296,7 +308,7 @@ export const createResourceStore = <T extends BasicResource>(
         activateStore(key)
         setResourceStoreValues(key, {
           activeTimer: setTimeout(() => {
-            if (entry.subbers.size === 0) cleanupStore(key)
+            if (entry.subscribers.size === 0) cleanupStore(key)
           }, defaultedConfig.timeout),
         })
       }
@@ -309,20 +321,28 @@ export const createResourceStore = <T extends BasicResource>(
 
     getById: id => resources.get(id),
 
-    subscribe: (key, fn) => {
+    subscribeQuery: (key, fn) => {
       const entry = resourceStore.get(key)
-      if (entry.subbers.size === 0) activateStore(key)
-      entry.subbers.add(fn)
+      if (entry.subscribers.size === 0) activateStore(key)
+      entry.subscribers.add(fn)
       clearTimeout(entry.activeTimer)
       return () => {
-        entry.subbers.delete(fn)
+        entry.subscribers.delete(fn)
         setResourceStoreValues(key, {
           activeTimer: setTimeout(() => {
-            if (entry.subbers.size === 0) cleanupStore(key)
+            if (entry.subscribers.size === 0) cleanupStore(key)
           }, defaultedConfig.timeout),
         })
       }
     },
+    subscribeIds: (ids, fn) => {
+      const obj = {ids, fn}
+      resourceSubscribers.add(obj)
+      return () => {
+        resourceSubscribers.delete(obj)
+      }
+    },
+
     remove: deleteIds,
     upsert: upsertItems,
     reload: (key: string) => createResolver(key),

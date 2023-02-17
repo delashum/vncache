@@ -169,7 +169,7 @@ export const createRequestClosure = <RInstance extends ResourceInstance<any>>(
     const subscribe =
       cache.__context.type === 'fetch'
         ? resourceInstance.store.object.subscribe
-        : resourceInstance.store.resource.subscribe
+        : resourceInstance.store.resource.subscribeQuery
 
     return {isResolving, resolver, getData, subscribe}
   }
