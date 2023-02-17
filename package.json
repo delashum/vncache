@@ -1,11 +1,17 @@
 {
-  "name": "vncache",
+  "name": "@delashum/vncache",
   "version": "1.0.0",
-  "description": "",
+  "description": "a library to simplify API requests and caching with a REST backend",
   "main": "src/index.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write src/**/*.ts",
+    "prepare": "npm run build",
+    "build": "rm -r dist/ && tsc --project tsconfig.build.json"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/delashum/vncache.git"
@@ -30,5 +36,9 @@
   },
   "peerDependencies": {
     "react": "^17"
-  }
+  },
+  "keywords": [
+    "cache",
+    "api"
+  ]
 }

@@ -5,6 +5,9 @@
     "baseUrl": "src",
     "downlevelIteration": true,
     "target": "ES2018",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "alwaysStrict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
@@ -12,9 +15,12 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     // "strictNullChecks": true,
+    "esModuleInterop": true,
+    // "strict": true,
     "useUnknownInCatchVariables": true,
     "types": ["node", "jest"]
   },
+  "files": ["./src/index.ts"],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

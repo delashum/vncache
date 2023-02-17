@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks'
 import {useState} from 'react'
 
-import {createResourceCache, resource} from '.'
+import {createResourceCache, resource} from '..'
 
 // MOCKS
 
