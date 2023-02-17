@@ -1,8 +1,9 @@
 {
   "name": "@delashum/vncache",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a library to simplify API requests and caching with a REST backend",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "format": "prettier --write src/**/*.ts",
