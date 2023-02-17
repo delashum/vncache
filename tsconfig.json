@@ -2,6 +2,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "allowJs": true,
+    "module": "commonjs",
     "baseUrl": "src",
     "downlevelIteration": true,
     "target": "ES2018",
