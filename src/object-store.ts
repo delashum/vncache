@@ -176,7 +176,7 @@ export const createObjectStore = <T extends BasicResource>(
   const activateObjectStore = (key: string) => {
     const entry = objectStore.get(key)
     if (entry.initialized === false) return
-    if (watch) entry.cleanup = watch(entry.body, createRequestWatcherActionsClosure(entry.body))
+    if (watch) entry.cleanup = watch(entry.body, createRequestWatcherActionsClosure(entry.key))
   }
 
   return {

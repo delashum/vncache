@@ -174,3 +174,17 @@ export const createResourceCache = <ResourceCache extends Record<string, Resourc
 }
 
 export {type ResourceInstance, type ResourceCacheInstance} from './types'
+
+/**
+ * things to do still
+ * 1. using resource (maybe fetch too) data within an action
+ *    on orgs/update we need orgs/me to get the org
+ *    statuses
+ * 2. resourceless fetching
+ *    one reason is to make organizing things easier
+ * 3. updating a request (without refetching)
+ * 4. reordering resources
+ * 5. the way watching works kinda sucks (this is from me)
+ * 6. when we reload we need to know how to ignore events older than a certain time
+ *    maybe we allow custom event filtering
+ */
