@@ -99,10 +99,34 @@ const resourceC = resource<{id: string; value: number}, {error?: boolean}>(async
   .watch('c.deleted', (b, e, u) => u.remove('c2'))
   .request('embeddedC', async (b, r) => r({id: 'c1', value: 10}))
 
+const resourceD = resource<{id: string}>(async ({ids, query}) => {
+  cFetch()
+  await sleep(50)
+  return [{id: 'd1'}]
+}).request(
+  'randomData',
+  async (b, r) => {
+    return {
+      one: 1,
+      two: 2,
+      three: 3,
+    }
+  },
+  [
+    [
+      'randomData.squared',
+      (_, __, {patch}) => {
+        patch({two: 4, three: 9})
+      },
+    ],
+  ]
+)
+
 const resources = {
   a: resourceA,
   b: resourceB,
   c: resourceC,
+  d: resourceD,
 }
 
 // SETUP
@@ -337,6 +361,15 @@ describe('vnrcache', () => {
       $cache.publish({name: 'b.created', payload: newB1}, false)
       const r3 = await $cache.b.resolve()
       expect(r3).toHaveLength(6)
+    })
+    it('update request body from request watcher', async () => {
+      const $cache = createResourceCache(resources)
+      const fetcher = $cache.d.fetch('randomData')
+      const d1 = await fetcher.resolve()
+      expect(d1).toEqual({one: 1, two: 2, three: 3})
+      $cache.publish({name: 'randomData.squared'}, false)
+      const d2 = await fetcher.resolve()
+      expect(d2).toEqual({one: 1, two: 4, three: 9})
     })
   })
 
