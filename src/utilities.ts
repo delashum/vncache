@@ -4,6 +4,9 @@ export const distinct = <T>(values: T[]) => {
   const set = new Set(values)
   return Array.from(set)
 }
+export const concrete = <T>(values: T[]) => {
+  return values.filter(isDefined)
+}
 
 export const IDENTITY_FN = <T>(e: T) => e
 

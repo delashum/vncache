@@ -153,14 +153,6 @@ export const createObjectStore = <T extends BasicResource>(
   }
 
   const createRequestWatcherActionsClosure = (key: string): RequestWatcherActions<T> => ({
-    upsert: items => {
-      resourceStore.upsert(items as any)
-      updateSubscribersByResourceIds(ensureArray(items).map(r => r.id))
-    },
-    remove: ids => {
-      resourceStore.remove(ids)
-      updateSubscribersByResourceIds(ids)
-    },
     patch: (update, which) => {
       for (const [_key, entry] of objectStore.entries()) {
         if (entry.key === key) {
@@ -170,6 +162,9 @@ export const createObjectStore = <T extends BasicResource>(
           }
         }
       }
+    },
+    reload: () => {
+      // TODO
     },
   })
 

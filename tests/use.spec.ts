@@ -1,9 +1,9 @@
 import {act, renderHook} from '@testing-library/react-hooks'
 import {useState} from 'react'
 
-import {createResourceCache} from '..'
-import {MOCK_FNS, MOCK_RESOURCES} from './mocks'
-import {sleep} from './utils'
+import {createResourceCache} from '../src'
+import {MOCK_FNS, MOCK_RESOURCES} from './helpers/mocks'
+import {sleep} from './helpers/utils'
 
 describe('use', () => {
   it('works', async () => {
@@ -40,7 +40,7 @@ describe('use', () => {
   })
   it('embedded resources are live', async () => {
     const $cache = createResourceCache(MOCK_RESOURCES)
-    const {result, waitForNextUpdate} = renderHook(() => $cache.a.fetch('oneA', null).use())
+    const {result, waitForNextUpdate} = renderHook(() => $cache.a.fetch('oneA').use())
     await waitForNextUpdate()
     expect(result.current.myA).toBeDefined()
     expect(result.current.myA.id).toEqual('a1')

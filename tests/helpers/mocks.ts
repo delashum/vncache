@@ -1,4 +1,4 @@
-import {resource} from '..'
+import {resource} from '../../src'
 import {sleep} from './utils'
 
 export const MOCK_FNS = {
@@ -20,6 +20,8 @@ export const MOCK_FNS = {
   },
 }
 
+/** A */
+
 const resourceA = resource(async ({ids, query}) => {
   MOCK_FNS.a.fetch()
   await sleep(50)
@@ -39,12 +41,14 @@ const resourceA = resource(async ({ids, query}) => {
     MOCK_FNS.a.getRequest()
     return {myA: r({id: 'a1', b_id: 'b1', b_ids: ['b1', 'b2', 'b3']})}
   })
-  .action('updateA1', async (body: void, u) => {
+  .action('updateA1', async (body: any, u) => {
     u.upsert({id: 'a1', b_id: 'b2'})
   })
-  .action('reloadAll', async (body: void, u) => {
+  .action('reloadAll', async (body: any, u) => {
     u.reload()
   })
+
+/** B */
 
 export type TypeB = {id: string; value: number}
 const resourceB = resource<TypeB, {error?: boolean; returnEmpty?: boolean}>(async ({ids, query}) => {

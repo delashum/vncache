@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks'
 
-import {createResourceCache} from '..'
-import {MOCK_RESOURCES, TypeB} from './mocks'
+import {createResourceCache} from '../src'
+import {MOCK_RESOURCES, TypeB} from './helpers/mocks'
 
 describe('events', () => {
   it('inserts new resource to empty cache', async () => {

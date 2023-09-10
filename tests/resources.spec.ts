@@ -1,6 +1,6 @@
-import {createResourceCache} from '..'
-import {MOCK_FNS, MOCK_RESOURCES} from './mocks'
-import {sleep} from './utils'
+import {createResourceCache} from '../src'
+import {MOCK_FNS, MOCK_RESOURCES} from './helpers/mocks'
+import {sleep} from './helpers/utils'
 
 describe('resources', () => {
   it('basic resolve works', async () => {

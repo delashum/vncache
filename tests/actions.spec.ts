@@ -1,5 +1,5 @@
-import {createResourceCache} from '..'
-import {MOCK_FNS, MOCK_RESOURCES} from './mocks'
+import {createResourceCache} from '../src'
+import {MOCK_FNS, MOCK_RESOURCES} from './helpers/mocks'
 
 describe('actions', () => {
   it('action upsert adds', async () => {
@@ -30,7 +30,7 @@ describe('actions', () => {
   })
   it('action updates reload embedded request resources', async () => {
     const $cache = createResourceCache(MOCK_RESOURCES)
-    const res1 = await $cache.a.fetch('oneA', null).resolve()
+    const res1 = await $cache.a.fetch('oneA').resolve()
     expect(MOCK_FNS.a.getRequest).toHaveBeenCalledTimes(1)
     expect(MOCK_FNS.a.sumRequest).toHaveBeenCalledTimes(0)
     expect(MOCK_FNS.a.fetch).toHaveBeenCalledTimes(0)
@@ -39,7 +39,7 @@ describe('actions', () => {
     expect(res1.myA.b_id).toEqual('b1')
 
     await $cache.a.do('updateA1', null)
-    const res2 = await $cache.a.fetch('oneA', null).resolve()
+    const res2 = await $cache.a.fetch('oneA').resolve()
     expect(MOCK_FNS.a.getRequest).toHaveBeenCalledTimes(1)
     expect(MOCK_FNS.a.sumRequest).toHaveBeenCalledTimes(0)
     expect(MOCK_FNS.a.fetch).toHaveBeenCalledTimes(0)

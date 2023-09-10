@@ -1,9 +1,9 @@
 module.exports = {
-  roots: ['src'],
+  roots: ['tests'],
   testEnvironment: 'jsdom',
   testMatch: ['**/?(*.)+(spec).+(ts)'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/helpers/setup.ts'],
 }

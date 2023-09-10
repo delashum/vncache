@@ -1,5 +1,5 @@
-import {createResourceCache} from '..'
-import {MOCK_FNS, MOCK_RESOURCES} from './mocks'
+import {createResourceCache} from '../src'
+import {MOCK_FNS, MOCK_RESOURCES} from './helpers/mocks'
 
 describe('batch', () => {
   it('batching works with multiple resources', async () => {

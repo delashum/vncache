@@ -95,9 +95,8 @@ export type ActionActions<T extends BasicResource, Q> = {
 }
 
 export type RequestWatcherActions<T extends BasicResource, CB = any, CR = any> = {
-  remove: (ids: string | string[]) => void
   patch: (update: Partial<CR>, which?: (body: CB) => boolean) => void
-  upsert: (items: AtLeast<T, 'id'> | AtLeast<T, 'id'>[]) => void
+  reload: (which?: () => boolean) => void
 }
 
 export type CacheWatcherFn<T extends BasicResource = any, Q = any, EV = any> = (
@@ -196,7 +195,9 @@ export type ResourceCacheInstance<
   ResponseType = ResourceResponse<T['ResourceType']>
 > = {
   query: (body: T['QueryBody']) => Omit<ResourceCacheInstance<T, ResponseType>, 'ids' | 'fetch' | 'query' | 'do'>
-  ids: (...ids: string[]) => Omit<ResourceCacheInstance<T, ResponseType>, 'query' | 'fetch' | 'ids' | 'do'>
+  ids: (
+    ...ids: (string | undefined)[]
+  ) => Omit<ResourceCacheInstance<T, ResponseType>, 'query' | 'fetch' | 'ids' | 'do'>
   nest: <Key extends Extract<keyof UnArray<ResponseType>, string>, C extends ResourceCacheInstance<any, any>>(
     key: Key,
     resource: C

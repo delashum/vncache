@@ -10,7 +10,7 @@ import {
   ResourceInstance,
   UnArray,
 } from './types'
-import {arrayToMap, distinct, ensureArray} from './utilities'
+import {arrayToMap, concrete, distinct, ensureArray} from './utilities'
 
 /**
  * Creates a closure for each chained method when consuming a resource. This allows reusability and isolates state.
@@ -57,7 +57,7 @@ export const createRequestClosure = <RInstance extends ResourceInstance<any>>(
       updatedContext.type = 'resource'
       const newBody = {...cache.__context.body}
       if ('query' in updates) newBody.query = updates.query
-      if ('ids' in updates) newBody.ids = distinct([...(newBody.ids ?? []), ...updates.ids])
+      if ('ids' in updates) newBody.ids = concrete(distinct([...(newBody.ids ?? []), ...updates.ids]))
       const sanitizedBody = resourceInstance.sanitizeQuery(newBody)
       updatedContext.cacheKey = resourceInstance.store.resource.register(newBody, sanitizedBody, resourceInstance.fn)
       updatedContext.body = newBody
